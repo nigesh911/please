@@ -7,6 +7,8 @@ const SharedListContent = dynamicImport(() => import('./SharedListContent'), {
   loading: () => <p>Loading shared list...</p>
 });
 
+export const dynamic = 'force-dynamic';
+
 export default function SharedList() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -20,6 +22,3 @@ export default function SharedList() {
     </div>
   );
 }
-
-// This tells Next.js not to statically generate this page
-export const config = { dynamic: 'force-dynamic' };

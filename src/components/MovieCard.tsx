@@ -9,7 +9,7 @@ import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 interface MovieCardProps {
   id: number;
   title: string;
-  posterPath: string;
+  posterPath: string | null;
   onAddToWatchedList: (movieId: number) => void;
   showAddButton?: boolean;
 }
@@ -61,6 +61,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ id, title, posterPath, onAddToWat
     }
   };
 
+  const imageSrc = posterPath
+    ? `https://image.tmdb.org/t/p/w500${posterPath}`
+    : '/placeholder-image.jpg'; // Add a placeholder image to your public folder
+
   return (
     <motion.div
       className="card relative"
@@ -68,7 +72,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ id, title, posterPath, onAddToWat
       whileTap={{ scale: 0.95 }}
     >
       <Image
-        src={`https://image.tmdb.org/t/p/w500${posterPath}`}
+        src={imageSrc}
         alt={title}
         width={500}
         height={750}

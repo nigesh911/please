@@ -8,12 +8,13 @@ import Navbar from '../../components/Navbar';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
-import { encodeWatchedList } from '../../utils/watchedListUtils';
+import { encodeWatchedList, WatchedMovie } from '../../utils/watchedListUtils';
 
-interface Movie {
+interface Movie extends WatchedMovie {
   id: string;
   title: string;
   poster_path: string;
+  movieId: number; // Add this line if it's not already present
 }
 
 interface SearchResult {
@@ -75,7 +76,7 @@ export default function WatchedPage() {
           userId: user.uid,
           movieId: movie.id,
           title: movie.title,
-          poster_path: movie.poster_path,
+          poster_path: movie.poster_path || null, // Handle potentially undefined poster_path
           timestamp: new Date()
         });
 
@@ -102,7 +103,10 @@ export default function WatchedPage() {
   };
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}/share?list=${encodeWatchedList(watchedMovies)}`;
+    const watchedMoviesForEncoding: WatchedMovie[] = watchedMovies.map(movie => ({
+      movieId: movie.movieId
+    }));
+    const shareUrl = `${window.location.origin}/share?list=${encodeWatchedList(watchedMoviesForEncoding)}`;
     navigator.clipboard.writeText(shareUrl).then(() => {
       alert('Share link copied to clipboard!');
     });

@@ -34,6 +34,9 @@ export default function SharedListContent() {
         const decodedList = decodeWatchedList(listParam);
         const moviePromises = decodedList.map(async (id: number) => {
           const response = await fetch(`${API_BASE_URL}/movie/${id}?api_key=${API_KEY}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch movie with ID ${id}`);
+          }
           return response.json();
         });
 
@@ -74,8 +77,8 @@ export default function SharedListContent() {
       </div>
       <div className="mt-8 text-center">
         <p>Want to create your own movie list?</p>
-        <Link href="/signup" className="mt-4 inline-block bg-primary text-white px-4 py-2 rounded hover:bg-opacity-80">
-          Sign Up Now
+        <Link href="/login" className="mt-4 inline-block bg-primary text-white px-4 py-2 rounded hover:bg-opacity-80">
+          Sign Up or Log In
         </Link>
       </div>
     </div>
