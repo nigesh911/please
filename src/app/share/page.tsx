@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import { default as dynamicImport } from 'next/dynamic';
 import Navbar from '../../components/Navbar';
 
-const SharedListContent = dynamic(() => import('./SharedListContent'), { 
+const SharedListContent = dynamicImport(() => import('./SharedListContent'), { 
   ssr: false,
   loading: () => <p>Loading shared list...</p>
 });
@@ -22,6 +22,4 @@ export default function SharedList() {
 }
 
 // This tells Next.js not to statically generate this page
-export function generateStaticParams() {
-  return [];
-}
+export const config = { dynamic: 'force-dynamic' };

@@ -8,6 +8,7 @@ import Navbar from '../../components/Navbar';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
+import { encodeWatchedList } from '../../utils/watchedListUtils';
 
 interface Movie {
   id: string;
@@ -101,7 +102,7 @@ export default function WatchedPage() {
   };
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}/share?userId=${user?.uid}`;
+    const shareUrl = `${window.location.origin}/share?list=${encodeWatchedList(watchedMovies)}`;
     navigator.clipboard.writeText(shareUrl).then(() => {
       alert('Share link copied to clipboard!');
     });

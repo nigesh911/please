@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import MovieCard from '../../components/MovieCard';
+import { decodeWatchedList } from '../../utils/watchedListUtils';
+import Link from 'next/link';
 
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const API_BASE_URL = 'https://api.themoviedb.org/3';
@@ -29,7 +31,7 @@ export default function SharedListContent() {
       }
 
       try {
-        const decodedList = JSON.parse(atob(listParam));
+        const decodedList = decodeWatchedList(listParam);
         const moviePromises = decodedList.map(async (id: number) => {
           const response = await fetch(`${API_BASE_URL}/movie/${id}?api_key=${API_KEY}`);
           return response.json();
@@ -57,17 +59,25 @@ export default function SharedListContent() {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
-      {movies.map(movie => (
-        <MovieCard
-          key={movie.id}
-          id={movie.id}
-          title={movie.title}
-          posterPath={movie.poster_path}
-          onAddToWatchedList={() => {}}
-          showAddButton={false}
-        />
-      ))}
+    <div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+        {movies.map(movie => (
+          <MovieCard
+            key={movie.id}
+            id={movie.id}
+            title={movie.title}
+            posterPath={movie.poster_path}
+            onAddToWatchedList={() => {}}
+            showAddButton={false}
+          />
+        ))}
+      </div>
+      <div className="mt-8 text-center">
+        <p>Want to create your own movie list?</p>
+        <Link href="/signup" className="mt-4 inline-block bg-primary text-white px-4 py-2 rounded hover:bg-opacity-80">
+          Sign Up Now
+        </Link>
+      </div>
     </div>
   );
 }
