@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User, updateProfile } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +19,8 @@ const Navbar: React.FC = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [username, setUsername] = useState('');
   const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -95,6 +97,19 @@ const Navbar: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <nav className="bg-card-bg text-text shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,7 +118,7 @@ const Navbar: React.FC = () => {
             <Link href="/" className="flex-shrink-0 flex items-center">
               <span className="text-2xl font-bold text-primary">MovieApp</span>
             </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="hidden md:ml-6 md:flex md:space-x-8">
               <Link href="/" className="text-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
                 Home
               </Link>
@@ -184,16 +199,63 @@ const Navbar: React.FC = () => {
             ) : (
               <motion.button
                 onClick={() => setShowAuthForm(true)}
-                className="ml-4 btn btn-primary"
+                className="ml-4 btn btn-primary hidden md:block"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Sign In / Sign Up
               </motion.button>
             )}
+            <div className="md:hidden ml-4">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-text hover:text-primary focus:outline-none"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            ref={menuRef}
+            className="md:hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <Link href="/" className="text-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">
+                Home
+              </Link>
+              <Link href="/trending" className="text-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">
+                Trending
+              </Link>
+              <Link href="/watched" className="text-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">
+                Watched
+              </Link>
+              <Link href="/chat" className="text-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">
+                Chat
+              </Link>
+              {!user && (
+                <button
+                  onClick={() => {
+                    setShowAuthForm(true);
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full text-left text-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  Sign In / Sign Up
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {showAuthForm && !user && (
           <motion.div
